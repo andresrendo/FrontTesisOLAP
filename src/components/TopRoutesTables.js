@@ -7,7 +7,6 @@ function TopRoutesTables() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Consulta para el año 2023
     fetchTopRoutes({ year: 2023 })
       .then((res) => {
         setData(res);
@@ -19,11 +18,36 @@ function TopRoutesTables() {
       });
   }, []);
 
+  // Nombres de columnas en español
+  const columnsEs = [
+    'Origen',
+    'Destino',
+    'Tickets',
+    'Revenue (USD)'
+  ];
+
   const renderTable = (engine, label) => {
     if (!data || !data[engine] || !Array.isArray(data[engine].result)) return null;
-    const rows = data[engine].result;
+    let rows = data[engine].result;
     if (rows.length === 0) return <div className="alert alert-warning text-center">No hay resultados para {label}</div>;
-    const columns = Object.keys(rows[0]);
+
+    // MonetDB: array de arrays, PostgreSQL: array de objetos
+    if (engine === 'monet') {
+      rows = rows.map(arr => ({
+        origen: arr[0],
+        destino: arr[1],
+        tickets: arr[2],
+        revenue: arr[3]
+      }));
+    } else {
+      rows = rows.map(obj => ({
+        origen: obj.origin_airport,
+        destino: obj.destination_airport,
+        tickets: obj.tickets,
+        revenue: obj.revenue
+      }));
+    }
+
     return (
       <div className="col-md-6 mb-4">
         <div className="card shadow">
@@ -34,13 +58,16 @@ function TopRoutesTables() {
             <table className="table table-bordered table-striped align-middle text-center">
               <thead className="table-light">
                 <tr>
-                  {columns.map(col => <th key={col}>{col}</th>)}
+                  {columnsEs.map(col => <th key={col}>{col}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, idx) => (
                   <tr key={idx}>
-                    {columns.map(col => <td key={col}>{row[col]}</td>)}
+                    <td>{row.origen}</td>
+                    <td>{row.destino}</td>
+                    <td>{row.tickets}</td>
+                    <td>{row.revenue}</td>
                   </tr>
                 ))}
               </tbody>
@@ -67,8 +94,8 @@ function TopRoutesTables() {
           <div className="col-12 alert alert-warning text-center">No hay datos</div>
         ) : (
           <>
-            {renderTable('pg', 'PostgreSQL - Top Routes')}
-            {renderTable('monet', 'MonetDB - Top Routes')}
+            {renderTable('pg', 'PostgreSQL - Rutas Top')}
+            {renderTable('monet', 'MonetDB - Rutas Top')}
           </>
         )}
       </div>

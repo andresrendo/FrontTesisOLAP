@@ -42,3 +42,15 @@ export async function fetchHealthMonet() {
   if (!res.ok) throw new Error('Error al obtener health monet');
   return await res.json();
 }
+
+export async function fetchTicketsByWeekday(year = 2023) {
+  const res = await fetch(`${API_BASE}/olap/tickets-by-weekday?year=${year}`);
+  if (!res.ok) throw new Error('Error al obtener tickets-by-weekday');
+  return await res.json();
+}
+
+export async function fetchLeastTravelledNationality(year = 2023, limit = 1) {
+  const res = await fetch(`${API_BASE}/olap/least-travelled-nationality?year=${year}&limit=${limit}`);
+  if (!res.ok) throw new Error('Error al obtener least-travelled-nationality');
+  return await res.json();
+}
