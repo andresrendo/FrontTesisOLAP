@@ -1,0 +1,44 @@
+export async function fetchDockerStats() {
+  const res = await fetch(`${API_BASE}/monitor/docker-stats`);
+  if (!res.ok) throw new Error('Error al obtener docker stats');
+  return await res.json();
+}
+// src/api.js
+
+const API_BASE = 'http://localhost:3000/api';
+
+export async function fetchRevenueByCountry(year = 2023) {
+  const res = await fetch(`${API_BASE}/olap/revenue-by-country?year=${year}`);
+  if (!res.ok) throw new Error('Error al obtener revenue-by-country');
+  return await res.json();
+}
+
+export async function fetchTopRoutes() {
+  const res = await fetch(`${API_BASE}/olap/top-routes`);
+  if (!res.ok) throw new Error('Error al obtener top-routes');
+  return await res.json();
+}
+
+export async function fetchMonitor(db) {
+  const res = await fetch(`${API_BASE}/monitor/${db}`);
+  if (!res.ok) throw new Error('Error al obtener monitor');
+  return await res.json();
+}
+
+export async function fetchHealth() {
+  const res = await fetch(`${API_BASE}/health`);
+  if (!res.ok) throw new Error('Error al obtener health');
+  return await res.json();
+}
+
+export async function fetchHealthPg() {
+  const res = await fetch(`${API_BASE}/health/pg`);
+  if (!res.ok) throw new Error('Error al obtener health pg');
+  return await res.json();
+}
+
+export async function fetchHealthMonet() {
+  const res = await fetch(`${API_BASE}/health/monet`);
+  if (!res.ok) throw new Error('Error al obtener health monet');
+  return await res.json();
+}
