@@ -54,3 +54,22 @@ export async function fetchLeastTravelledNationality(year = 2023, limit = 1) {
   if (!res.ok) throw new Error('Error al obtener least-travelled-nationality');
   return await res.json();
 }
+
+export async function fetchRevenueBySeatClassAndMonth(year = 2023) {
+  const res = await fetch(`${API_BASE}/olap/revenue-by-seatclass-month?year=${year}`);
+  if (!res.ok) throw new Error('Error al obtener revenue-by-seatclass-month');
+  return await res.json();
+}
+
+
+export async function fetchDelayedAverage(year = 2023) {
+  const res = await fetch(`${API_BASE}/olap/delayed-average?year=${year}`);
+  if (!res.ok) throw new Error('Error al obtener delayed-average');
+  return await res.json();
+}
+
+export async function fetchPassengersByAircraft(year = 2023) {
+  const res = await fetch(`${API_BASE}/olap/passengers-by-aircraft?year=${year}`);
+  if (!res.ok) throw new Error('Error al obtener passengers-by-aircraft');
+  return await res.json();
+}
