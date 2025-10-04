@@ -73,3 +73,16 @@ export async function fetchPassengersByAircraft(year = 2023) {
   if (!res.ok) throw new Error('Error al obtener passengers-by-aircraft');
   return await res.json();
 }
+
+export async function fetchAdjustedProfitRoutes(year = 2023, limit = 20) {
+  const res = await fetch(`${API_BASE}/olap/adjusted-profit-routes?year=${year}&limit=${limit}`);
+  if (!res.ok) throw new Error('Error al obtener adjusted-profit-routes');
+  return await res.json();
+}
+
+
+export async function fetchFrequentPassengerRevenue(year = 2023, limit = 20) {
+  const res = await fetch(`${API_BASE}/olap/frequent-passenger-revenue?year=${year}&limit=${limit}`);
+  if (!res.ok) throw new Error('Error al obtener frequent-passenger-revenue');
+  return await res.json();
+}
