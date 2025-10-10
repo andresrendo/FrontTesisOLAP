@@ -86,3 +86,15 @@ export async function fetchFrequentPassengerRevenue(year = 2023, limit = 20) {
   if (!res.ok) throw new Error('Error al obtener frequent-passenger-revenue');
   return await res.json();
 }
+
+export async function addFlights(count = 100) {
+  const res = await fetch(`${API_BASE}/olap/add-flights?count=${count}`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al agregar vuelos');
+  return await res.json();
+}
+
+export async function removeFlights(count = 100) {
+  const res = await fetch(`${API_BASE}/olap/remove-flights?count=${count}`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al eliminar vuelos');
+  return await res.json();
+}

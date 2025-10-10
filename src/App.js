@@ -12,6 +12,8 @@ import DelayedAverage from './components/DelayedAverage';
 import PassengersByAircraft from './components/PassengersByAircraft';
 import AdjustedProfitRoutes from './components/AdjustedProfitRoutes';
 import FrequentPassengerRevenue from './components/FrequentPassengerRevenue';
+import FlightActions from './components/dataAddOrRemove';
+
 import Footer from './components/Footer';
 
 function App() {
@@ -39,12 +41,11 @@ function App() {
           <option value="adjustedProfitRoutes">Rutas más rentables (ajustado) - Complejidad Alta</option>
           <option value="frequentPassengerRevenue">Ingresos por Pasajeros Frecuentes - Complejidad Alta</option>
 
-
-
           </select>
           {selectedQuery === 'toproutes' ? <TopRoutesTables /> : selectedQuery === 'revenue' ? <RevenueByCountry /> : selectedQuery === 'leastTravelledNationality' ? <LeastTravelledNationalityTable /> : selectedQuery === 'revenueBySeatClassAndMonth' ? <RevenueBySeatClassAndMonthTable /> : selectedQuery === 'revenueAccumulated' ? <RevenueAccumulated /> : selectedQuery === 'delayedAverage' ? <DelayedAverage /> : selectedQuery === 'passengersByAircraft' ? <PassengersByAircraft /> : selectedQuery === 'adjustedProfitRoutes' ? <AdjustedProfitRoutes /> : selectedQuery === 'frequentPassengerRevenue' ? <FrequentPassengerRevenue /> : <TicketsByWeekdayTable />}
         </div>
         <DockerStatsTable />
+        <FlightActions />
       </main>
       <Footer />
     </div>
