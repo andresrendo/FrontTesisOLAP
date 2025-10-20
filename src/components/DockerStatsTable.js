@@ -85,6 +85,7 @@ function DockerStatsTable() {
                     <th>Contenedor</th>
                     <th>CPU (%)</th>
                     <th>Memoria</th>
+                    <th>Net I/O</th>
                     <th>Velocidad (ms)</th>
                   </tr>
                 </thead>
@@ -101,6 +102,7 @@ function DockerStatsTable() {
                         </td>
                         <td>{val.cpu}</td>
                         <td>{val.mem}</td>
+                        <td>{val.netio || '-'}</td>
                         <td>{dbKey && speeds[dbKey] != null ? speeds[dbKey].toFixed(2) : '-'}</td>
                       </tr>
                     );
