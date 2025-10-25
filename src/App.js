@@ -13,6 +13,7 @@ import PassengersByAircraft from './components/PassengersByAircraft';
 import AdjustedProfitRoutes from './components/AdjustedProfitRoutes';
 import FrequentPassengerRevenue from './components/FrequentPassengerRevenue';
 import FlightActions from './components/dataAddOrRemove';
+import DbSizesMonitor from './components/DbSizesMonitor';
 
 import Footer from './components/Footer';
 
@@ -44,7 +45,9 @@ function App() {
           </select>
           {selectedQuery === 'toproutes' ? <TopRoutesTables /> : selectedQuery === 'revenue' ? <RevenueByCountry /> : selectedQuery === 'leastTravelledNationality' ? <LeastTravelledNationalityTable /> : selectedQuery === 'revenueBySeatClassAndMonth' ? <RevenueBySeatClassAndMonthTable /> : selectedQuery === 'revenueAccumulated' ? <RevenueAccumulated /> : selectedQuery === 'delayedAverage' ? <DelayedAverage /> : selectedQuery === 'passengersByAircraft' ? <PassengersByAircraft /> : selectedQuery === 'adjustedProfitRoutes' ? <AdjustedProfitRoutes /> : selectedQuery === 'frequentPassengerRevenue' ? <FrequentPassengerRevenue /> : <TicketsByWeekdayTable />}
         </div>
+
         <DockerStatsTable />
+        <DbSizesMonitor intervalMs={3000} pollMs={10000} />
         <FlightActions />
       </main>
       <Footer />

@@ -1,11 +1,6 @@
-export async function fetchDockerStats() {
-  const res = await fetch(`${API_BASE}/monitor/docker-stats`);
-  if (!res.ok) throw new Error('Error al obtener docker stats');
-  return await res.json();
-}
 // src/api.js
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 export async function fetchQuerySql(name, opts = {}) {
   const qs = new URLSearchParams({
@@ -40,9 +35,10 @@ export async function fetchTopRoutes() {
 }
 
 export async function fetchMonitor(db) {
-  const res = await fetch(`${API_BASE}/monitor/${db}`);
-  if (!res.ok) throw new Error('Error al obtener monitor');
-  return await res.json();
+  const q = db ? `?db=${encodeURIComponent(db)}` : '';
+  const res = await fetch(`/api/monitor${q}`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 export async function fetchHealth() {
@@ -146,3 +142,17 @@ export async function removeFlightsBatch(count = 100) {
 // Opcional: mantener alias viejo por compatibilidad (renombrados para evitar colisión)
 export const addFlightsLegacy = addFlightsRow;
 export const removeFlightsLegacy = removeFlightsRow;
+
+export async function fetchDockerStats() {
+  const res = await fetch(`${API_BASE}/monitor/docker-stats`);
+  if (!res.ok) throw new Error('Error al obtener docker stats');
+  return await res.json();
+}
+
+// nueva función para tamaños
+export async function fetchDbSizes(intervalMs = 0) {
+  const q = intervalMs > 0 ? `?intervalMs=${intervalMs}` : '';
+  const res = await fetch(`${API_BASE}/monitor/db-sizes${q}`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
