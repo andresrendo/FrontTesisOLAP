@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { fetchPassengersByAircraft } from '../api';
+import useQuerySql from '../hooks/useQuerySql';
 
 function PassengersByAircraft() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // SQL toggle states (Postgres / Monet)
+  const [showSqlPg, setShowSqlPg] = useState(false);
+  const [showSqlMonet, setShowSqlMonet] = useState(false);
+
+  const year = 2023;
+  const sqls = useQuerySql('passengersByAircraft', { year });
+
   useEffect(() => {
-    fetchPassengersByAircraft(2023)
+    fetchPassengersByAircraft(year)
       .then(res => setData(res))
-      .catch(err => setError(err.message))
+      .catch(err => setError(err.message || String(err)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [year]);
 
   const columns = ['Modelo de avión', 'Total de pasajeros'];
 
@@ -20,12 +28,22 @@ function PassengersByAircraft() {
     let rows = data[engine].result;
     if (rows.length === 0) return <div className="alert alert-warning text-center">No hay resultados para {label}</div>;
 
+    // MonetDB devuelve array de arrays, PostgreSQL array de objetos
     if (engine === 'monet') {
       rows = rows.map(arr => ({
         aircraft_model: arr[0],
         total_passengers: arr[1]
       }));
+    } else {
+      rows = rows.map(obj => ({
+        aircraft_model: obj.aircraft_model || obj.model || obj.name,
+        total_passengers: obj.total_passengers || obj.total || obj.count
+      }));
     }
+
+    const sqlText = sqls ? (engine === 'pg' ? sqls.pg : sqls.monet) : '';
+    const isShown = engine === 'pg' ? showSqlPg : showSqlMonet;
+    const toggle = () => (engine === 'pg' ? setShowSqlPg(s => !s) : setShowSqlMonet(s => !s));
 
     return (
       <div className="col-md-6 mb-4">
@@ -49,6 +67,16 @@ function PassengersByAircraft() {
                 ))}
               </tbody>
             </table>
+
+            <div className="p-2">
+              <button className="btn btn-sm btn-outline-secondary" type="button" onClick={toggle}>
+                {isShown ? 'Ocultar SQL' : 'Mostrar SQL'}
+              </button>
+              <div style={{ display: isShown ? 'block' : 'none', marginTop: 10, background: '#f8f9fa', padding: 12, border: '1px solid #e9ecef', borderRadius: 4 }}>
+                <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontSize: 13 }}>{sqlText || 'SQL no disponible'}</pre>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

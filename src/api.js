@@ -7,6 +7,26 @@ export async function fetchDockerStats() {
 
 const API_BASE = 'http://localhost:3000/api';
 
+export async function fetchQuerySql(name, opts = {}) {
+  const qs = new URLSearchParams({
+    name,
+    ...(opts.year ? { year: opts.year } : {}),
+    ...(opts.limit ? { limit: opts.limit } : {})
+  });
+  const res = await fetch(`${API_BASE}/olap/query-sql?${qs.toString()}`);
+  const text = await res.text().catch(() => '');
+  if (!res.ok) {
+    throw new Error(`fetchQuerySql failed: ${res.status} ${text}`);
+  }
+  // intenta parsear JSON (el backend devuelve JSON)
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    // si no es JSON, devolver raw string en estructura consistente
+    return { ok: true, name, pg: text, monet: text };
+  }
+}
+
 export async function fetchRevenueByCountry(year = 2023) {
   const res = await fetch(`${API_BASE}/olap/revenue-by-country?year=${year}`);
   if (!res.ok) throw new Error('Error al obtener revenue-by-country');
@@ -88,13 +108,41 @@ export async function fetchFrequentPassengerRevenue(year = 2023, limit = 20) {
 }
 
 export async function addFlights(count = 100) {
-  const res = await fetch(`${API_BASE}/olap/add-flights?count=${count}`, { method: 'POST' });
+  const res = await fetch(`${API_BASE}/olap/add-flights-new?count=${count}`, { method: 'POST' });
   if (!res.ok) throw new Error('Error al agregar vuelos');
   return await res.json();
 }
 
 export async function removeFlights(count = 100) {
-  const res = await fetch(`${API_BASE}/olap/remove-flights?count=${count}`, { method: 'POST' });
+  const res = await fetch(`${API_BASE}/olap/remove-flights-new?count=${count}`, { method: 'POST' });
   if (!res.ok) throw new Error('Error al eliminar vuelos');
   return await res.json();
 }
+
+// Legacy / row-by-row (mantener compatibilidad)
+export async function addFlightsRow(count = 100) {
+  const res = await fetch(`${API_BASE}/olap/add-flights-row?count=${count}`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al agregar vuelos (row)');
+  return await res.json();
+}
+export async function removeFlightsRow(count = 100) {
+  const res = await fetch(`${API_BASE}/olap/remove-flights-row?count=${count}`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al eliminar vuelos (row)');
+  return await res.json();
+}
+
+// Batch endpoints
+export async function addFlightsBatch(count = 100) {
+  const res = await fetch(`${API_BASE}/olap/add-flights-batch?count=${count}`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al agregar vuelos (batch)');
+  return await res.json();
+}
+export async function removeFlightsBatch(count = 100) {
+  const res = await fetch(`${API_BASE}/olap/remove-flights-batch?count=${count}`, { method: 'POST' });
+  if (!res.ok) throw new Error('Error al eliminar vuelos (batch)');
+  return await res.json();
+}
+
+// Opcional: mantener alias viejo por compatibilidad (renombrados para evitar colisión)
+export const addFlightsLegacy = addFlightsRow;
+export const removeFlightsLegacy = removeFlightsRow;

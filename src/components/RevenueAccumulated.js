@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useQuerySql from '../hooks/useQuerySql'; // { added }
 
 const API_BASE = 'http://localhost:3000/api';
 
@@ -12,6 +13,7 @@ function RevenueAccumulated() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const sqls = useQuerySql('revenueAccumulated'); // <-- ajusta si tu archivo query tiene otro nombre
 
   useEffect(() => {
     fetchRevenueAccumulated(2023)
@@ -59,24 +61,43 @@ function RevenueAccumulated() {
             <h4 className="mb-0">{label}</h4>
           </div>
           <div className="card-body">
-            <table className="table table-bordered table-striped align-middle text-center">
-              <thead className="table-light">
-                <tr>
-                  {columnsEs.map(col => <th key={col}>{col}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, idx) => (
-                  <tr key={idx}>
-                    <td>{row.clase_asiento}</td>
-                    <td>{row.mes}</td>
-                    <td>{row.revenue_mensual}</td>
-                    <td>{row.revenue_acumulado}</td>
-                    <td>{row.ranking_clase}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* wrapper con altura máxima y scroll vertical */}
+            <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+              <table className="table table-bordered table-striped align-middle text-center mb-0">
+                <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                  <tr>{columnsEs.map(col => <th key={col}>{col}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, idx) => (
+                    <tr key={idx}>
+                      <td>{row.clase_asiento}</td>
+                      <td>{row.mes}</td>
+                      <td>{row.revenue_mensual}</td>
+                      <td>{row.revenue_acumulado}</td>
+                      <td>{row.ranking_clase}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {sqls && (
+              <div className="mt-3">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  type="button"
+                  onClick={() => {
+                    const pre = document.getElementById(`sql-revenueAccumulated-${engine}`);
+                    if (pre) pre.style.display = pre.style.display === 'none' ? 'block' : 'none';
+                  }}
+                >
+                  Mostrar SQL
+                </button>
+                <pre id={`sql-revenueAccumulated-${engine}`} style={{ display: 'none', whiteSpace: 'pre-wrap', marginTop: 8, background:'#f8f9fa', padding:10 }}>
+{engine === 'pg' ? sqls.pg : sqls.monet}
+                </pre>
+              </div>
+            )}
           </div>
         </div>
       </div>

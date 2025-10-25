@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchFrequentPassengerRevenue } from '../api';
+import useQuerySql from '../hooks/useQuerySql';
 
 const columns = [
   'Aeropuerto Origen',
@@ -15,11 +16,17 @@ function FrequentPassengerRevenue({ year = 2023, limit = 20 }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // SQL toggle states (igual que AdjustedProfitRoutes)
+  const [showSqlPg, setShowSqlPg] = useState(false);
+  const [showSqlMonet, setShowSqlMonet] = useState(false);
+
+  const sqls = useQuerySql('frequentPassengerRevenue', { year, limit });
+
   useEffect(() => {
     setLoading(true);
     fetchFrequentPassengerRevenue(year, limit)
       .then(setData)
-      .catch(e => setError(e.message))
+      .catch(e => setError(e.message || String(e)))
       .finally(() => setLoading(false));
   }, [year, limit]);
 
@@ -39,6 +46,11 @@ function FrequentPassengerRevenue({ year = 2023, limit = 20 }) {
         frequent_revenue_pct: arr[5]
       }));
     }
+
+    const sqlText = sqls ? (engine === 'pg' ? sqls.pg : sqls.monet) : '';
+
+    const isShown = engine === 'pg' ? showSqlPg : showSqlMonet;
+    const toggle = () => (engine === 'pg' ? setShowSqlPg(s => !s) : setShowSqlMonet(s => !s));
 
     return (
       <div
@@ -68,13 +80,27 @@ function FrequentPassengerRevenue({ year = 2023, limit = 20 }) {
                     <td>{row.departure_airport}</td>
                     <td>{row.arrival_airport}</td>
                     <td>{row.month}</td>
-                    <td>{Number(row.total_revenue).toFixed(2)}</td>
-                    <td>{Number(row.frequent_revenue).toFixed(2)}</td>
-                    <td>{Number(row.frequent_revenue_pct).toFixed(2)}</td>
+                    <td>{row.total_revenue != null ? Number(row.total_revenue).toFixed(2) : '—'}</td>
+                    <td>{row.frequent_revenue != null ? Number(row.frequent_revenue).toFixed(2) : '—'}</td>
+                    <td>{row.frequent_revenue_pct != null ? Number(row.frequent_revenue_pct).toFixed(2) : '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            <div className="p-2">
+              <button
+                className="btn btn-sm btn-outline-secondary"
+                type="button"
+                onClick={toggle}
+              >
+                {isShown ? 'Ocultar SQL' : 'Mostrar SQL'}
+              </button>
+              <div style={{ display: isShown ? 'block' : 'none', marginTop: 10, background: '#f8f9fa', padding: 12, border: '1px solid #e9ecef', borderRadius: 4 }}>
+                <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontSize: 13 }}>{sqlText || 'SQL no disponible'}</pre>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

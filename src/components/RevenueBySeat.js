@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchRevenueBySeatClassAndMonth } from '../api';
+import useQuerySql from '../hooks/useQuerySql';
 
 function RevenueBySeatClassAndMonthTable() {
   const [data, setData] = useState(null);
@@ -13,6 +14,7 @@ function RevenueBySeatClassAndMonthTable() {
       .finally(() => setLoading(false));
   }, []);
 
+  const sqls = useQuerySql('revenueBySeat');
   const columnsEs = ['Clase de Asiento', 'Mes', 'Revenue (USD)'];
 
   const renderTable = (engine, label) => {
@@ -42,22 +44,41 @@ function RevenueBySeatClassAndMonthTable() {
             <h4 className="mb-0">{label}</h4>
           </div>
           <div className="card-body">
-            <table className="table table-bordered table-striped align-middle text-center">
-              <thead className="table-light">
-                <tr>
-                  {columnsEs.map(col => <th key={col}>{col}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, idx) => (
-                  <tr key={idx}>
-                    <td>{row.clase_asiento}</td>
-                    <td>{row.mes}</td>
-                    <td>{row.revenue}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* wrapper con altura máxima y scroll vertical */}
+            <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+              <table className="table table-bordered table-striped align-middle text-center mb-0">
+                <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                  <tr>{columnsEs.map(col => <th key={col}>{col}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, idx) => (
+                    <tr key={idx}>
+                      <td>{row.clase_asiento}</td>
+                      <td>{row.mes}</td>
+                      <td>{row.revenue}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {sqls && (
+              <div className="mt-3">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  type="button"
+                  onClick={() => {
+                    const pre = document.getElementById(`sql-revenueBySeat-${engine}`);
+                    if (pre) pre.style.display = pre.style.display === 'none' ? 'block' : 'none';
+                  }}
+                >
+                  Mostrar SQL
+                </button>
+                <pre id={`sql-revenueBySeat-${engine}`} style={{ display: 'none', whiteSpace: 'pre-wrap', marginTop: 8, background:'#f8f9fa', padding:10 }}>
+{engine === 'pg' ? sqls.pg : sqls.monet}
+                </pre>
+              </div>
+            )}
           </div>
         </div>
       </div>
