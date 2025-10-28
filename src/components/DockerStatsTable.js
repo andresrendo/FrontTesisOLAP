@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchDockerStats, fetchMonitor } from '../api';
 
-const POLL_MS = 3000; // intervalo de polling en ms
+const POLL_MS = 1000; // intervalo de polling en ms
 
 function DockerStatsTable() {
   const [stats, setStats] = useState(null);
